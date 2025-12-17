@@ -72,10 +72,33 @@ $this->title = 'My Yii Application';
                     }
                 ],
                 [
-                    'label' => 'Действия',
+                    'label' => 'Питание',
                     'format' => 'raw',
                     'value' => function (Apple $apple) {
-                        return '';
+                        if ($apple->status !== Apple::STATUS_FELL) {
+                            return '';
+                        }
+
+                        $form = Html::beginForm(Url::to(['apple/eat']));
+                        $id = Html::input('hidden', 'id', $apple->id);
+                        $input = Html::input('number', 'bit', options: ['class' => 'form-control', 'min' => 1, 'max' => 100, 'step' => 1]);
+                        $submit = Html::submitButton('Откусить', ['class' => 'btn btn-primary flex-shrink-0']);
+                        $formEnd = Html::endForm();
+
+                        return $form . $id . $input . $submit . $formEnd;
+                    }
+                ],
+                [
+                    'label' => 'Уход за садом',
+                    'format' => 'raw',
+                    'value' => function (Apple $apple) {
+                        $fallBtn = $apple->status === Apple::STATUS_ON_A_BRANCH ?
+                            Html::a('Сбить с дерева', Url::to(['apple/fall', 'id' => $apple->id]), ['class' => 'btn btn-primary']) : '';
+
+                        $throwBtn = $apple->status === Apple::STATUS_ROTTEN ?
+                            Html::a('Выкинуть', Url::to(['apple/delete', 'id' => $apple->id]), ['class' => 'btn btn-warning']) : '';
+
+                        return $fallBtn . $throwBtn;
                     }
                 ]
             ],

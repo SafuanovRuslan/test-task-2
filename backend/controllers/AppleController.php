@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\Apple\AppleService;
 use Yii;
+use yii\db\Exception;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -24,7 +25,7 @@ class AppleController extends Controller
     }
 
     /**
-     * {@inheritdoc}
+     * @return array[]
      */
     public function behaviors()
     {
@@ -33,7 +34,7 @@ class AppleController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['grow'],
+                        'actions' => ['grow', 'eat', 'fall', 'delete'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -43,17 +44,18 @@ class AppleController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'grow' => ['get'],
+                    'eat' => ['post'],
+                    'fall' => ['get'],
+                    'delete' => ['get'],
                 ],
             ],
         ];
     }
 
     /**
-     * Displays homepage.
-     *
      * @return Response
      */
-    public function actionGrow()
+    public function actionGrow(): Response
     {
         if ($this->service->createApples()) {
             Yii::$app->session->setFlash('success', 'В саду появились новые яблоки');
@@ -62,6 +64,60 @@ class AppleController extends Controller
         }
 
         Yii::$app->session->setFlash('danger', 'Не удалось вырастить новый урожай');
+
+        return $this->redirect(['site/index']);
+    }
+
+    public function actionEat(): Response
+    {
+        $id = Yii::$app->request->post('id');
+        $bit = abs(Yii::$app->request->post('bit'));
+
+        if (!$error = $this->service->eat($id, $bit)) {
+            Yii::$app->session->setFlash('success', 'Отличный укус, приятного аппетита');
+
+            return $this->redirect(['site/index']);
+        }
+
+        Yii::$app->session->setFlash('danger', $error);
+
+        return $this->redirect(['site/index']);
+    }
+
+    /**
+     * @return Response
+     * @throws Exception
+     */
+    public function actionFall(): Response
+    {
+        $id = Yii::$app->request->get('id');
+
+        if (!$error = $this->service->fall($id)) {
+            Yii::$app->session->setFlash('success', 'Отлично, теперь его можно съесть');
+
+            return $this->redirect(['site/index']);
+        }
+
+        Yii::$app->session->setFlash('danger', $error);
+
+        return $this->redirect(['site/index']);
+    }
+
+    /**
+     * @return Response
+     * @throws Exception
+     */
+    public function actionDelete(): Response
+    {
+        $id = Yii::$app->request->get('id');
+
+        if (!$error = $this->service->delete($id)) {
+            Yii::$app->session->setFlash('success', 'Хорошая работа, на один тухляк меньше');
+
+            return $this->redirect(['site/index']);
+        }
+
+        Yii::$app->session->setFlash('danger', $error);
 
         return $this->redirect(['site/index']);
     }

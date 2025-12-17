@@ -9,7 +9,7 @@ class AppleFabric
      */
     public function createOne(): Apple
     {
-        $start = time() - 30 * 24 * 60 * 60;
+        $start = time() - 24 * 60 * 60;
         $end = time();
 
         $apple = new Apple();
