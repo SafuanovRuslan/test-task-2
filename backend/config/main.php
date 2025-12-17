@@ -10,9 +10,16 @@ return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'modules' => [],
     'components' => [
+        'queue' => [
+            'class' => \yii\queue\db\Queue::class,
+            'db' => 'db',
+            'tableName' => '{{%queue}}',
+            'channel' => 'default',
+            'mutex' => \yii\mutex\PgsqlMutex::class,
+        ],
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],

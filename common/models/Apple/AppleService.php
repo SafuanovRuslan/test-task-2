@@ -2,6 +2,7 @@
 
 namespace common\models\Apple;
 
+use console\jobs\RotAppleJob;
 use Exception;
 use Throwable;
 use Yii;
@@ -22,7 +23,7 @@ readonly class AppleService
             'pagination' => false,
             'sort' => [
                 'defaultOrder' => [
-                    'id' => SORT_DESC,
+                    'id' => SORT_ASC,
                 ],
             ],
         ]);
@@ -75,6 +76,11 @@ readonly class AppleService
         if (!$this->repository->save($apple)) {
             return 'Не удалось сбить яблоко с дерева';
         }
+
+        Yii::$app->queue->delay(5 * 60)
+            ->push(new RotAppleJob([
+                'appleId' => $apple->id,
+            ]));
 
         return '';
     }
