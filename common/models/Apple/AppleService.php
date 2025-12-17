@@ -4,6 +4,7 @@ namespace common\models\Apple;
 
 use Exception;
 use Yii;
+use yii\data\ActiveDataProvider;
 
 readonly class AppleService
 {
@@ -11,6 +12,19 @@ readonly class AppleService
         private AppleFabric     $fabric,
         private AppleRepository $repository
     ) {}
+
+    public function dataProvider(): ActiveDataProvider
+    {
+        return new ActiveDataProvider([
+            'query' => $this->repository->dataProvider(),
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_DESC,
+                ],
+            ],
+        ]);
+    }
 
     /**
      * @return bool

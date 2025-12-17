@@ -39,7 +39,7 @@ class Apple extends ActiveRecord
         return [
             'color' => 'Цвет',
             'status' => 'Состояние',
-            'eaten' => 'Откушено',
+            'eaten' => 'Цельность',
             'created_at' => 'Дата созревания',
             'fell_at' => 'Упало с ветки',
         ];

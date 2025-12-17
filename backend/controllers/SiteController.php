@@ -2,8 +2,10 @@
 
 namespace backend\controllers;
 
+use common\models\Apple\AppleService;
 use common\models\LoginForm;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -14,6 +16,15 @@ use yii\web\Response;
  */
 class SiteController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private readonly AppleService $appleService,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -62,7 +73,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'dataProvider' => $this->appleService->dataProvider(),
+        ]);
     }
 
     /**
